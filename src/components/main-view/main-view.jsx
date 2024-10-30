@@ -4,9 +4,9 @@ import { MovieView } from '../movie-view/movie-view';
 
 export const MainView = () => {
 	const [movies, setMovies] = useState([]);
-
 	const [selectedMovie, setSelectedMovie] = useState(null);
 
+	// fetch movies from API
 	useEffect(() => {
 		fetch('https://my-flix-2-a94518576195.herokuapp.com/movies')
 			.then((response) => response.json())
@@ -22,7 +22,7 @@ export const MainView = () => {
 				}));
 				setMovies(moviesFromApi);
 			});
-	});
+	}, []);
 
 	if (selectedMovie)
 		return (
