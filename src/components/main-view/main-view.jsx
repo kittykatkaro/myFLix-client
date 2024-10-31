@@ -17,7 +17,6 @@ export const MainView = () => {
 		fetch('https://my-flix-2-a94518576195.herokuapp.com/movies')
 			.then((response) => response.json())
 			.then((data) => {
-				console.log('movies from api', data);
 				const moviesFromApi = data.map((movie) => ({
 					id: movie._id,
 					Title: movie.title,
@@ -90,6 +89,8 @@ export const MainView = () => {
 					setToken(null);
 					localStorage.clear();
 				}}
+				className="back-button"
+				style={{ cursor: 'pointer' }}
 			>
 				Logout
 			</button>
