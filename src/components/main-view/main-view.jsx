@@ -12,23 +12,6 @@ export const MainView = () => {
 	const [movies, setMovies] = useState([]);
 	const [selectedMovie, setSelectedMovie] = useState(null);
 
-	// fetch movies from API
-	useEffect(() => {
-		fetch('https://my-flix-2-a94518576195.herokuapp.com/movies')
-			.then((response) => response.json())
-			.then((data) => {
-				const moviesFromApi = data.map((movie) => ({
-					id: movie._id,
-					Title: movie.title,
-					Description: movie.description,
-					Genre: movie.genre.name,
-					Director: movie.director.name,
-					Image: movie.image,
-				}));
-				setMovies(moviesFromApi);
-			});
-	}, []);
-
 	//authenticate requests to API through user token
 	useEffect(() => {
 		if (!token) {
@@ -40,7 +23,15 @@ export const MainView = () => {
 		})
 			.then((response) => response.json())
 			.then((data) => {
-				console.log(data);
+				const moviesFromApi = data.map((movie) => ({
+					id: movie._id,
+					Title: movie.title,
+					Description: movie.description,
+					Genre: movie.genre.name,
+					Director: movie.director.name,
+					Image: movie.image,
+				}));
+				setMovies(moviesFromApi);
 			});
 	}, [token]);
 
