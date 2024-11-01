@@ -1,3 +1,6 @@
+import React from 'react';
+import { Button, Form } from 'react-bootstrap';
+
 export const SignupView = () => {
 	const handleSubmit = (event) => {
 		event.preventDefault();
@@ -29,20 +32,26 @@ export const SignupView = () => {
 	};
 
 	return (
-		<form onSubmit={handleSubmit}>
-			<label>
-				Username: <input type="text" required />
-			</label>
-			<label>
-				Password: <input type="password" required />
-			</label>
-			<label>
-				Email: <input type="email" required />
-			</label>
-			<label>
-				Birthday: <input type="date" required />
-			</label>
-			<button type="submit">Submit</button>
-		</form>
+		<Form onSubmit={handleSubmit}>
+			<Form.Group controlID="formUsername">
+				<Form.Label>Username:</Form.Label>
+				<Form.Control type="text" required minLength="3" />
+			</Form.Group>
+			<Form.Group controlID="formPassword">
+				<Form.Label>Password:</Form.Label>
+				<Form.Control type="password" required />
+			</Form.Group>
+			<Form.Group controlID="formEmail">
+				<Form.Label>Email:</Form.Label>
+				<Form.Control type="email" required />
+			</Form.Group>
+			<Form.Group controlID="formBirthday">
+				<Form.Label>Birthday:</Form.Label>
+				<Form.Control type="date" required />
+			</Form.Group>
+			<Button variant="primary" type="submit">
+				Submit
+			</Button>
+		</Form>
 	);
 };
