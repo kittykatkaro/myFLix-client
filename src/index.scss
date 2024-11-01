@@ -1,5 +1,15 @@
-$color: steelblue;
+$color: Crimson;
 
 .my-flix {
 	color: $color;
 }
+
+img {
+	max-width: 100%;
+}
+
+$primary: Crimson;
+$body-bg: LavenderBlush;
+
+//import bootstrap
+@import '../node_modules/bootstrap/scss/bootstrap';
