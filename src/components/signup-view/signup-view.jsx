@@ -48,6 +48,7 @@ export const SignupView = () => {
 					type="password"
 					required
 					minLength="6"
+					maxLength="20"
 					placeholder="Password (min. 6 characters)"
 				/>
 			</Form.Group>
