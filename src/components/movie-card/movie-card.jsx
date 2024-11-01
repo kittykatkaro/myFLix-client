@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import { Card } from 'react-bootstrap';
 import { Button, Card } from 'react-bootstrap';
-import './movie-card.scss';
 
 export const MovieCard = ({ movieData, onMovieClick }) => {
 	return (
@@ -10,7 +9,10 @@ export const MovieCard = ({ movieData, onMovieClick }) => {
 			<Card.Body>
 				<Card.Title>{movieData.Title}</Card.Title>
 				<Card.Text>{movieData.Genre}</Card.Text>
-				<Button onClick={() => onMovieClick(movieData)} variant="link">
+				<Button
+					onClick={() => onMovieClick(movieData)}
+					variant="primary"
+				>
 					Open
 				</Button>
 			</Card.Body>
