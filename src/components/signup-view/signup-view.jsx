@@ -35,15 +35,29 @@ export const SignupView = () => {
 		<Form onSubmit={handleSubmit}>
 			<Form.Group controlId="formUsername">
 				<Form.Label>Username:</Form.Label>
-				<Form.Control type="text" required minLength="3" />
+				<Form.Control
+					type="text"
+					required
+					minLength="3"
+					placeholder="Username"
+				/>
 			</Form.Group>
 			<Form.Group controlId="formPassword">
 				<Form.Label>Password:</Form.Label>
-				<Form.Control type="password" required />
+				<Form.Control
+					type="password"
+					required
+					minLength="6"
+					placeholder="Password (min. 6 characters)"
+				/>
 			</Form.Group>
 			<Form.Group controlId="formEmail">
 				<Form.Label>Email:</Form.Label>
-				<Form.Control type="email" required />
+				<Form.Control
+					type="email"
+					required
+					placeholder="yourname@mail.com"
+				/>
 			</Form.Group>
 			<Form.Group controlId="formBirthday">
 				<Form.Label>Birthday:</Form.Label>
