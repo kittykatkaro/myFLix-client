@@ -3,6 +3,7 @@ import { MovieCard } from '../movie-card/movie-card';
 import { MovieView } from '../movie-view/movie-view';
 import { LoginView } from '../login-view/login-view';
 import { SignupView } from '../signup-view/signup-view';
+import { Button, Row, Col, Card, Container } from 'react-bootstrap';
 
 export const MainView = () => {
 	const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -28,63 +29,72 @@ export const MainView = () => {
 					Title: movie.title,
 					Description: movie.description,
 					Genre: movie.genre.name,
-					Director: movie.director.name,
+					Director:
+						movie.director.first_name +
+						' ' +
+						movie.director.last_name,
 					Image: movie.image,
 				}));
 				setMovies(moviesFromApi);
 			});
 	}, [token]);
 
-	if (!user) {
-		return (
-			<>
-				<LoginView
-					onLoggedIn={(user, token) => {
-						setUser(user);
-						setToken(token);
-					}}
-				/>
-				or
-				<SignupView />
-			</>
-		);
-	}
-
-	if (selectedMovie)
-		return (
-			<MovieView
-				movieData={selectedMovie}
-				onBackClick={() => setSelectedMovie(null)}
-			/>
-		);
-
-	if (movies.length === 0) {
-		return <div className="main-view">The list is empty!</div>;
-	}
-
 	return (
-		<div>
-			{movies.map((movie) => (
-				<MovieCard
-					key={movie.id}
-					movieData={movie}
-					onMovieClick={(newSelectedMovie) => {
-						setSelectedMovie(newSelectedMovie);
-					}}
-				/>
-			))}
+		<Row className="justify-content-md-center">
+			{!user ? (
+				<Col md={10} className="d-flex justify-content-around">
+					{/* Login Card */}
+					<Card style={{ width: '45%' }}>
+						<Card.Body>
+							<Card.Title>Login</Card.Title>
+							<LoginView onLoggedIn={(user) => setUser(user)} />
+						</Card.Body>
+					</Card>
 
-			<button
-				onClick={() => {
-					setUser(null);
-					setToken(null);
-					localStorage.clear();
-				}}
-				className="back-button"
-				style={{ cursor: 'pointer' }}
-			>
-				Logout
-			</button>
-		</div>
+					{/* Signup Card */}
+					<Card style={{ width: '45%' }}>
+						<Card.Body>
+							<Card.Title>Signup</Card.Title>
+							<SignupView />
+						</Card.Body>
+					</Card>
+				</Col>
+			) : selectedMovie ? (
+				<Col md={8}>
+					<MovieView
+						movieData={selectedMovie}
+						onBackClick={() => setSelectedMovie(null)}
+					/>
+				</Col>
+			) : (
+				<>
+					{movies.map((movie) => (
+						<Col className="mb-5" key={movie.id} md={3}>
+							<MovieCard
+								key={movie.id}
+								movieData={movie}
+								onMovieClick={(movie) => {
+									setSelectedMovie(movie);
+								}}
+							/>
+						</Col>
+					))}
+					{/* Logout Button only shows on movie selection*/}
+					{user && (
+						<Col md={10} className="d-flex justify-content-center">
+							<Button
+								onClick={() => {
+									setUser(null);
+									setToken(null);
+									localStorage.clear();
+								}}
+							>
+								Logout
+							</Button>
+						</Col>
+					)}
+				</>
+			)}
+		</Row>
 	);
 };
