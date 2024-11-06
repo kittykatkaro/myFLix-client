@@ -56,6 +56,23 @@ export const MainView = () => {
 			});
 	}, [token]);
 
+	// user adds movie to favorites
+	const fav = (movieId) => {
+		fetch(
+			`https://my-flix-2-a94518576195.herokuapp.com/users/${user.username}/movies/${movieId}`,
+			{
+				method: 'PUT',
+				headers: { Authorization: `Bearer ${token}` },
+			}
+		)
+			.then((response) => response.json())
+			.then((data) => {
+				const favorites = data.FavoriteMovies;
+				setUser({ ...user, FavoriteMovies: favorites });
+				localStorage.setItem('user', JSON.stringify(user));
+			});
+	};
+
 	return (
 		<BrowserRouter>
 			<NavigationBar user={user} onLoggedOut={() => setUser(null)} />
@@ -136,6 +153,8 @@ export const MainView = () => {
 											<Col
 												className="mb-4"
 												key={movie.id}
+												// add favorite movie to user profile
+												onClick={() => fav(movie.id)}
 												md={3}
 											>
 												<MovieCard movie={movie} />
