@@ -4,15 +4,23 @@ import { Button, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 export const MovieCard = ({ movie }) => {
+	// user adds movie to favorites
+	const fav = (movieId) => {
+		console.log(movieId);
+	};
 	return (
 		<Card className="h-100">
 			<Card.Img variant="top" src={movie.Image} />
 			<Card.Body>
 				<Card.Title>{movie.Title}</Card.Title>
 				<Card.Text>{movie.Genre}</Card.Text>
-				<Link to={`/movies/${encodeURIComponent(movie._id)}`}>
+				<Link to={`/movies/${encodeURIComponent(movie.id)}`}>
 					<Button variant="primary">Open</Button>
 				</Link>
+
+				<Button variant="primary" onClick={() => fav(movie.id)}>
+					Add to Favorites
+				</Button>
 			</Card.Body>
 		</Card>
 	);
