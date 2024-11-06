@@ -3,7 +3,7 @@ import { MovieCard } from '../movie-card/movie-card';
 import { MovieView } from '../movie-view/movie-view';
 import { LoginView } from '../login-view/login-view';
 import { SignupView } from '../signup-view/signup-view';
-import { Button, Row, Col, Card, Container } from 'react-bootstrap';
+import { Button, Row, Col, Card } from 'react-bootstrap';
 
 export const MainView = () => {
 	const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -47,7 +47,12 @@ export const MainView = () => {
 					<Card style={{ width: '45%' }}>
 						<Card.Body>
 							<Card.Title>Login</Card.Title>
-							<LoginView onLoggedIn={(user) => setUser(user)} />
+							<LoginView
+								onLoggedIn={(user, token) => {
+									setUser(user);
+									setToken(token);
+								}}
+							/>
 						</Card.Body>
 					</Card>
 
