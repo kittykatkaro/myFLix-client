@@ -43,19 +43,26 @@ export const MainView = () => {
 		<Row className="justify-content-md-center">
 			{!user ? (
 				<Col md={10} className="d-flex justify-content-around">
-					{/* Login Card */}
+					{/* Conditional Login/Signup Card */}
 					<Card style={{ width: '45%' }}>
 						<Card.Body>
-							<Card.Title>Login</Card.Title>
-							<LoginView onLoggedIn={(user) => setUser(user)} />
-						</Card.Body>
-					</Card>
-
-					{/* Signup Card */}
-					<Card style={{ width: '45%' }}>
-						<Card.Body>
-							<Card.Title>Signup</Card.Title>
-							<SignupView />
+							<Card.Title>
+								{showLogin ? 'Login' : 'Signup'}
+							</Card.Title>
+							{/* Render Login or Signup based on showLogin */}
+							{showLogin ? (
+								<LoginView
+									onLoggedIn={(user) => setUser(user)}
+								/>
+							) : (
+								<SignupView />
+							)}
+							{/* Toggle Button */}
+							<Button variant="link" onClick={toggleView}>
+								{showLogin
+									? "Don't have an account? Sign up"
+									: 'Already have an account? Log in'}
+							</Button>
 						</Card.Body>
 					</Card>
 				</Col>
