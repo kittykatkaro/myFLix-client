@@ -20,7 +20,7 @@ export const MovieCard = ({ movie }) => {
 
 //define all prop contrains for the MovieCard component
 MovieCard.propTypes = {
-	movieData: PropTypes.shape({
+	movie: PropTypes.shape({
 		Title: PropTypes.string.isRequired,
 	}).isRequired,
 };
