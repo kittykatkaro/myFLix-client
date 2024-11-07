@@ -1,45 +1,47 @@
+import moment from 'moment';
 import { useState } from 'react';
 import { Button, Form, Card } from 'react-bootstrap';
+import { MovieCard } from '../movie-card/movie-card';
 
-export const ProfileView = ({ movies }) => {
+export const ProfileView = ({ movies, updateUser }) => {
+	// Get user data from localStorage
 	const localUser = JSON.parse(localStorage.getItem('user'));
+	const localToken = localStorage.getItem('token');
 
-	const [username, setUsername] = useState(localUser.Username || '');
-	const [password, setPassword] = useState(localUser.Password || '');
-	const [email, setEmail] = useState(localUser.Email || '');
-	const [birthday, setBirthday] = useState(
-		localUser.Birthday || '01/01/0001'
-	);
+	// Set initial state to user data
+	const [username, setUsername] = useState(localUser.username || '');
+	const [password, setPassword] = useState('');
+	const [email, setEmail] = useState(localUser.email || '');
+	const [birthday, setBirthday] = useState(localUser.birthday);
 
-	const handleSubmit = (event) => {
-		event.preventDefault();
+	// Handle form submission to update user data
+	const handleSubmit = (e) => {
+		e.preventDefault();
 
 		// Collect only the fields that have changed (i.e., non-empty)
-		const data = {};
-
-		if (username !== localUser.Username) data.Username = username;
-		if (password !== localUser.Password) data.Password = password;
-		if (email !== localUser.Email) data.Email = email;
-		if (birthday !== localUser.Birthday) data.Birthday = birthday;
+		const data = { username, password, email, birthday };
 
 		// Only send data if there is something to update
 		if (Object.keys(data).length > 0) {
 			fetch(
-				`https://my-flix-2-a94518576195.herokuapp.com/users/${localUser.Username}`,
+				`https://my-flix-2-a94518576195.herokuapp.com/users/${localUser.username}`,
 				{
 					method: 'PUT',
 					body: JSON.stringify(data),
 					headers: {
-						Authorization: `Bearer ${localUser.Token}`,
+						Authorization: `Bearer ${localToken}`,
 						'Content-Type': 'application/json',
 					},
 				}
 			).then((response) => {
 				if (response.ok) {
-					alert('Profile updated successfully');
-					window.location.reload();
+					response.json().then((user) => {
+						console.log('updated user', user);
+						updateUser(user);
+						alert('Profile updated successfully');
+					});
 				} else {
-					alert('Profile update failed');
+					alert('Failed to update profile');
 				}
 			});
 		} else {
@@ -53,12 +55,11 @@ export const ProfileView = ({ movies }) => {
 				<Card.Body>
 					<Card.Title>{localUser.username}</Card.Title>
 					<Card.Text>Email: {localUser.email}</Card.Text>
-					<Card.Text>Birthday: {localUser.birthday}</Card.Text>
 					<Card.Text>
-						Favorite Movies:{' '}
-						{localUser.favorites
-							? localUser.favorites.join(', ')
-							: 'None'}
+						Birthday:{' '}
+						{moment(localUser.birthday).format(
+							'MMMM Do YYYY, h:mm:ss a'
+						)}
 					</Card.Text>
 				</Card.Body>
 			</Card>
@@ -80,6 +81,7 @@ export const ProfileView = ({ movies }) => {
 							<Form.Control
 								type="password"
 								value={password}
+								required
 								onChange={(e) => setPassword(e.target.value)}
 							/>
 						</Form.Group>
@@ -95,7 +97,7 @@ export const ProfileView = ({ movies }) => {
 							<Form.Label>Birthday:</Form.Label>
 							<Form.Control
 								type="date"
-								value={birthday}
+								value={moment(birthday).format('YYYY-MM-DD')}
 								onChange={(e) => setBirthday(e.target.value)}
 							/>
 						</Form.Group>
@@ -105,6 +107,26 @@ export const ProfileView = ({ movies }) => {
 					</Form>
 				</Card.Body>
 			</Card>
+
+			{/* Favorite Movies */}
+			<div className="favorite_movies">
+				<h2>Favorite Movies</h2>
+				{localUser.favorites.length > 0 ? (
+					movies
+						.filter((movie) =>
+							localUser.favorites.includes(movie.id)
+						)
+						.map((movie) => (
+							<MovieCard
+								key={movie.id}
+								movie={movie}
+								updateUser={updateUser}
+							/>
+						))
+				) : (
+					<p>No favorite movies yet</p>
+				)}
+			</div>
 		</>
 	);
 };
