@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Form, Card, Carousel } from 'react-bootstrap';
+import { Button, Form, Card } from 'react-bootstrap';
 
 export const ProfileView = ({ movies }) => {
 	const localUser = JSON.parse(localStorage.getItem('user'));
@@ -10,32 +10,41 @@ export const ProfileView = ({ movies }) => {
 	const [birthday, setBirthday] = useState(
 		localUser.Birthday || '01/01/0001'
 	);
-	// const [favoriteMovies, setFavoriteMovies] = useState(
-	// 	localUser.favorites || []
-	// );
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
 
-		fetch(
-			`https://my-flix-2-a94518576195.herokuapp.com/users/${localUser.Username}`,
-			{
-				method: 'PUT',
-				headers: {
-					Authorization: `Bearer ${localUser.Token}`,
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(updatedUser),
-			}
-		)
-			.then((response) => response.json())
-			.then((data) => {
-				localStorage.setItem('user', JSON.stringify(data));
-				alert('Profile updated successfully!');
-			})
-			.catch((error) => {
-				console.error('Error:', error);
+		// Collect only the fields that have changed (i.e., non-empty)
+		const data = {};
+
+		if (username !== localUser.Username) data.Username = username;
+		if (password !== localUser.Password) data.Password = password;
+		if (email !== localUser.Email) data.Email = email;
+		if (birthday !== localUser.Birthday) data.Birthday = birthday;
+
+		// Only send data if there is something to update
+		if (Object.keys(data).length > 0) {
+			fetch(
+				`https://my-flix-2-a94518576195.herokuapp.com/users/${localUser.Username}`,
+				{
+					method: 'PUT',
+					body: JSON.stringify(data),
+					headers: {
+						Authorization: `Bearer ${localUser.Token}`,
+						'Content-Type': 'application/json',
+					},
+				}
+			).then((response) => {
+				if (response.ok) {
+					alert('Profile updated successfully');
+					window.location.reload();
+				} else {
+					alert('Profile update failed');
+				}
 			});
+		} else {
+			alert('No changes to update');
+		}
 	};
 
 	return (
@@ -63,7 +72,6 @@ export const ProfileView = ({ movies }) => {
 								type="text"
 								value={username}
 								onChange={(e) => setUsername(e.target.value)}
-								required
 								minLength="4"
 							/>
 						</Form.Group>
@@ -73,7 +81,6 @@ export const ProfileView = ({ movies }) => {
 								type="password"
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
-								required
 							/>
 						</Form.Group>
 						<Form.Group controlId="formEmail">
@@ -82,7 +89,6 @@ export const ProfileView = ({ movies }) => {
 								type="email"
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
-								required
 							/>
 						</Form.Group>
 						<Form.Group controlId="formBdate">
@@ -91,7 +97,6 @@ export const ProfileView = ({ movies }) => {
 								type="date"
 								value={birthday}
 								onChange={(e) => setBirthday(e.target.value)}
-								required
 							/>
 						</Form.Group>
 						<Button variant="primary" type="submit">
