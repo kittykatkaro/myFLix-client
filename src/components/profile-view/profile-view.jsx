@@ -1,53 +1,43 @@
 import { useState } from 'react';
-import { Button, Form, Card } from 'react-bootstrap';
+import { Button, Form, Card, Carousel } from 'react-bootstrap';
 
 export const ProfileView = ({ movies }) => {
 	const localUser = JSON.parse(localStorage.getItem('user'));
 
-	if (!localUser) {
-		return <p>Please log in to view and edit your profile.</p>;
-	}
-
-	const favMovies = movies.filter((movie) => {
-		return localUser.FavoriteMovies.includes(movie._id);
-	});
-
 	const [username, setUsername] = useState(localUser.Username || '');
-	const [password, setPassword] = useState('');
+	const [password, setPassword] = useState(localUser.Password || '');
 	const [email, setEmail] = useState(localUser.Email || '');
 	const [birthday, setBirthday] = useState(
 		localUser.Birthday || '01/01/0001'
 	);
+	// const [favoriteMovies, setFavoriteMovies] = useState(
+	// 	localUser.favorites || []
+	// );
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
 
-		const updatedUser = {
+		const data = {
 			Username: username,
 			Password: password,
 			Email: email,
 			Birthday: birthday,
 		};
 
-		fetch(
-			`https://my-flix-2-a94518576195.herokuapp.com/users/${localUser.Username}`,
-			{
-				method: 'PUT',
-				headers: {
-					Authorization: `Bearer ${localUser.Token}`,
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(updatedUser),
+		fetch('https://my-flix-2-a94518576195.herokuapp.com/users/:username', {
+			method: 'POST',
+			body: JSON.stringify(data),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		}).then((response) => {
+			if (response.ok) {
+				alert('Signup successful');
+				window.location.reload();
+			} else {
+				alert('Signup failed');
 			}
-		)
-			.then((response) => response.json())
-			.then((data) => {
-				localStorage.setItem('user', JSON.stringify(data));
-				alert('Profile updated successfully!');
-			})
-			.catch((error) => {
-				console.error('Error:', error);
-			});
+		});
 	};
 
 	return (
@@ -57,6 +47,12 @@ export const ProfileView = ({ movies }) => {
 					<Card.Title>{localUser.username}</Card.Title>
 					<Card.Text>Email: {localUser.email}</Card.Text>
 					<Card.Text>Birthday: {localUser.birthday}</Card.Text>
+					<Card.Text>
+						Favorite Movies:{' '}
+						{localUser.favorites
+							? localUser.favorites.join(', ')
+							: 'None'}
+					</Card.Text>
 				</Card.Body>
 			</Card>
 			<Card>
