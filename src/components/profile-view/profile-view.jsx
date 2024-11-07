@@ -17,27 +17,25 @@ export const ProfileView = ({ movies }) => {
 	const handleSubmit = (event) => {
 		event.preventDefault();
 
-		const data = {
-			Username: username,
-			Password: password,
-			Email: email,
-			Birthday: birthday,
-		};
-
-		fetch('https://my-flix-2-a94518576195.herokuapp.com/users/:username', {
-			method: 'POST',
-			body: JSON.stringify(data),
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		}).then((response) => {
-			if (response.ok) {
-				alert('Signup successful');
-				window.location.reload();
-			} else {
-				alert('Signup failed');
+		fetch(
+			`https://my-flix-2-a94518576195.herokuapp.com/users/${localUser.Username}`,
+			{
+				method: 'PUT',
+				headers: {
+					Authorization: `Bearer ${localUser.Token}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(updatedUser),
 			}
-		});
+		)
+			.then((response) => response.json())
+			.then((data) => {
+				localStorage.setItem('user', JSON.stringify(data));
+				alert('Profile updated successfully!');
+			})
+			.catch((error) => {
+				console.error('Error:', error);
+			});
 	};
 
 	return (
