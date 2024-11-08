@@ -3,7 +3,10 @@ import { MovieCard } from '../movie-card/movie-card';
 import { MovieView } from '../movie-view/movie-view';
 import { LoginView } from '../login-view/login-view';
 import { SignupView } from '../signup-view/signup-view';
-import { Button, Row, Col, Card, Container } from 'react-bootstrap';
+import { ProfileView } from '../profile-view/profile-view';
+import { Button, Row, Col, Card } from 'react-bootstrap';
+import { NavigationBar } from '../navigation-bar/navigation-bar';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 export const MainView = () => {
 	const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -11,14 +14,27 @@ export const MainView = () => {
 	const [user, setUser] = useState(storedUser ? storedUser : null);
 	const [token, setToken] = useState(storedToken ? storedToken : null);
 	const [movies, setMovies] = useState([]);
-	const [selectedMovie, setSelectedMovie] = useState(null);
+	const [loading, setIsLoading] = useState(true);
 
-	//authenticate requests to API through user token
+	// Load user and token from localStorage on component mount
+	useEffect(() => {
+		const storedUser = JSON.parse(localStorage.getItem('user'));
+		const storedToken = localStorage.getItem('token');
+
+		if (storedUser && storedToken) {
+			setUser(storedUser);
+			setToken(storedToken);
+		}
+		setIsLoading(false); // Loading is complete
+	}, []);
+
+	// Fetch movies when token changes
 	useEffect(() => {
 		if (!token) {
 			return;
 		}
 
+		setIsLoading(true); // start loading while fetching data
 		fetch('https://my-flix-2-a94518576195.herokuapp.com/movies', {
 			headers: { Authorization: `Bearer ${token}` },
 		})
@@ -36,65 +52,133 @@ export const MainView = () => {
 					Image: movie.image,
 				}));
 				setMovies(moviesFromApi);
+				setIsLoading(false); // stop loading when data is fetched
 			});
 	}, [token]);
 
-	return (
-		<Row className="justify-content-md-center">
-			{!user ? (
-				<Col md={10} className="d-flex justify-content-around">
-					{/* Login Card */}
-					<Card style={{ width: '45%' }}>
-						<Card.Body>
-							<Card.Title>Login</Card.Title>
-							<LoginView onLoggedIn={(user) => setUser(user)} />
-						</Card.Body>
-					</Card>
+	const updateUser = (user) => {
+		setUser(user);
+		localStorage.setItem('user', JSON.stringify(user));
+	};
 
-					{/* Signup Card */}
-					<Card style={{ width: '45%' }}>
-						<Card.Body>
-							<Card.Title>Signup</Card.Title>
-							<SignupView />
-						</Card.Body>
-					</Card>
-				</Col>
-			) : selectedMovie ? (
-				<Col md={8}>
-					<MovieView
-						movieData={selectedMovie}
-						onBackClick={() => setSelectedMovie(null)}
+	const onLoggedOut = () => {
+		setUser(null);
+		setToken(null);
+		localStorage.clear();
+	};
+
+	return (
+		<BrowserRouter>
+			<NavigationBar user={user} onLoggedOut={onLoggedOut} />
+			<Row className="justify-content-md-center">
+				<Routes>
+					<Route
+						path="/signup"
+						element={
+							<>
+								{user ? (
+									<Navigate to="/" />
+								) : (
+									<Col md={5}>
+										<SignupView />
+									</Col>
+								)}
+							</>
+						}
 					/>
-				</Col>
-			) : (
-				<>
-					{movies.map((movie) => (
-						<Col className="mb-5" key={movie.id} md={3}>
-							<MovieCard
-								key={movie.id}
-								movieData={movie}
-								onMovieClick={(movie) => {
-									setSelectedMovie(movie);
-								}}
-							/>
-						</Col>
-					))}
-					{/* Logout Button only shows on movie selection*/}
-					{user && (
-						<Col md={10} className="d-flex justify-content-center">
-							<Button
-								onClick={() => {
-									setUser(null);
-									setToken(null);
-									localStorage.clear();
-								}}
-							>
-								Logout
-							</Button>
-						</Col>
-					)}
-				</>
-			)}
-		</Row>
+					<Route
+						path="/login"
+						element={
+							<>
+								{user ? (
+									<Navigate to="/" />
+								) : (
+									<Col md={5}>
+										<LoginView
+											onLoggedIn={(user, token) => {
+												setUser(user);
+												setToken(token);
+												localStorage.setItem(
+													'user',
+													JSON.stringify(user)
+												);
+												localStorage.setItem(
+													'token',
+													token
+												);
+											}}
+										/>
+									</Col>
+								)}
+							</>
+						}
+					/>
+					<Route
+						path="/movies/:movieId"
+						element={
+							<>
+								{!user ? (
+									<Navigate to="/login" replace />
+								) : loading ? (
+									<Col>Loading...</Col>
+								) : movies.length === 0 ? (
+									<Col>The list is empty!</Col>
+								) : (
+									<Col md={8}>
+										<MovieView movies={movies} />
+									</Col>
+								)}
+							</>
+						}
+					/>
+					<Route
+						path="/"
+						element={
+							<>
+								{!user ? (
+									<Navigate to="/login" replace />
+								) : loading ? (
+									<Col>Loading...</Col>
+								) : movies.length === 0 ? (
+									<Col>The list is empty!</Col>
+								) : (
+									<>
+										{movies.map((movie) => (
+											<Col
+												className="mb-4"
+												key={movie.id}
+												md={3}
+											>
+												<MovieCard
+													movie={movie}
+													updateUser={updateUser}
+												/>
+											</Col>
+										))}
+									</>
+								)}
+							</>
+						}
+					/>
+					<Route
+						path="/profile"
+						element={
+							<>
+								{!user ? (
+									<Navigate to="/login" replace />
+								) : (
+									<Col md={5}>
+										<ProfileView
+											movies={movies}
+											updateUser={updateUser}
+										/>
+									</Col>
+								)}
+							</>
+						}
+					/>
+				</Routes>
+			</Row>
+		</BrowserRouter>
 	);
 };
