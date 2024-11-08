@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-import { Card } from 'react-bootstrap';
 import { Button, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
